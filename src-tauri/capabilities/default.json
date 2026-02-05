@@ -9,6 +9,16 @@
     "core:default",
     "dialog:default",
     "fs:default",
-    "log:default"
+    "log:default",
+    "fs:read-all",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        "C:/**",
+        "D:/**",
+        "E:/**",
+        "$HOME/**"
+      ]
+    }
   ]
 }

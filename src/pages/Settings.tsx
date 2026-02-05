@@ -504,11 +504,12 @@ const Settings = () => {
                                 </Select>
                             </Form.Item>
                           </Col>
-                           <Col span={12}>
-                            <Form.Item label={t('settings.modelName')} name="model">
-                                <Input placeholder="gpt-4o" />
-                            </Form.Item>
-                          </Col>
+                        {/* Model Name Removed as per task */ }
+                        {/* <Col span={12}>
+                             <Form.Item label={t('settings.modelName')} name="model">
+                                 <Input placeholder="gpt-4o" />
+                             </Form.Item>
+                           </Col> */}
                       </Row>
 
                     <Form.Item noStyle shouldUpdate={(prev, curr) => prev.auth_type !== curr.auth_type}>

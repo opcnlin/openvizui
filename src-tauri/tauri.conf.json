@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "openvizui",
+  "productName": "OpenVizUI",
   "version": "0.1.0",
   "identifier": "com.openvizui.app",
   "build": {
@@ -12,8 +12,8 @@
   "app": {
     "windows": [
       {
-        "title": "openvizui",
-        "width": 1460,
+        "title": "OpenVizUI",
+        "width": 1360,
         "height": 960,
         "resizable": true,
         "fullscreen": false,

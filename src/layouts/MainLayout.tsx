@@ -106,14 +106,17 @@ const MainLayout = () => {
           position: 'absolute',
           bottom: 0,
           width: '100%',
-          height: '48px',
+          height: '40px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           background: token.colorBgContainer,
           borderTop: `1px solid ${token.colorBorderSecondary}`,
-          color: token.colorText
+          color: token.colorTextSecondary,
+          fontSize: '22px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s'
         }}>
             {collapsed ? '›' : '‹'}
         </div>

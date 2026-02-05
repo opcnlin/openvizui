@@ -29,13 +29,10 @@ const EnvironmentStatusInfo = () => {
     { label: 'Node', version: envStatus.node_version },
     { label: 'npm', version: envStatus.npm_version },
     { label: 'Git', version: envStatus.git_version },
-    { label: 'Python', version: envStatus.python_version },
-    { label: 'Go', version: envStatus.go_version },
-    { label: 'Java', version: envStatus.java_version },
   ];
 
   return (
-    <Space size="large" style={{ width: '100%', justifyContent: 'center', flexWrap: 'wrap' }}>
+    <Space size={[8, 8]} wrap style={{ width: '100%', justifyContent: 'flex-start' }}>
       {items.map((item) => (
         <Tag 
           key={item.label} 

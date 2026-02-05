@@ -3,7 +3,7 @@ use std::process::Command;
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Emitter, State};
-use portable_pty::{CommandBuilder, NativePtySystem, PtySize, PtySystem, MasterPty};
+use portable_pty::{CommandBuilder, NativePtySystem, PtySize, PtySystem, MasterPty, Child};
 use std::sync::{Arc, Mutex};
 use std::io::{Read, Write};
 use std::thread;
@@ -22,6 +22,7 @@ fn create_background_command(program: &str) -> Command {
 struct AppPty {
     writer: Arc<Mutex<Option<Box<dyn Write + Send>>>>,
     master: Arc<Mutex<Option<Box<dyn MasterPty + Send>>>>,
+    child: Arc<Mutex<Option<Box<dyn Child + Send>>>>,
 }
 
 impl Default for AppPty {
@@ -29,6 +30,7 @@ impl Default for AppPty {
         Self {
             writer: Arc::new(Mutex::new(None)),
             master: Arc::new(Mutex::new(None)),
+            child: Arc::new(Mutex::new(None)),
         }
     }
 }
@@ -51,6 +53,19 @@ pub struct ToolStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+struct ModelEntry {
+    id: String,
+    object: Option<String>,
+    created: Option<u64>,
+    owned_by: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct ModelsResponse {
+    data: Vec<ModelEntry>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ApiConfig {
     pub id: String,
     pub name: String,
@@ -58,6 +73,7 @@ pub struct ApiConfig {
     pub base_url: Option<String>,
     pub api_key: Option<String>,
     pub model: Option<String>,
+    pub models: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -414,7 +430,7 @@ fn pty_open(app: AppHandle, state: State<'_, AppPty>, cols: u16, rows: u16) -> R
     let config = get_app_config(app.clone());
     let cmd_line = config.terminal_shell.unwrap_or_else(|| {
         if cfg!(target_os = "windows") {
-            "bash.exe".to_string()
+            "powershell.exe".to_string()
         } else {
             "bash".to_string()
         }
@@ -472,9 +488,10 @@ fn pty_open(app: AppHandle, state: State<'_, AppPty>, cols: u16, rows: u16) -> R
     let mut reader = pair.master.try_clone_reader().map_err(|e| e.to_string())?;
     let writer = pair.master.take_writer().map_err(|e| e.to_string())?;
     
-    // Store writer and master
+    // Store writer, master and child
     *state.writer.lock().unwrap() = Some(writer);
     *state.master.lock().unwrap() = Some(pair.master);
+    *state.child.lock().unwrap() = Some(child);
 
     // Spawn thread to read from PTY
     thread::spawn(move || {
@@ -496,6 +513,9 @@ fn pty_open(app: AppHandle, state: State<'_, AppPty>, cols: u16, rows: u16) -> R
 
 #[tauri::command]
 fn pty_close(state: State<'_, AppPty>) -> Result<(), String> {
+    if let Some(mut child) = state.child.lock().unwrap().take() {
+        let _ = child.kill();
+    }
     *state.writer.lock().unwrap() = None;
     *state.master.lock().unwrap() = None;
     Ok(())
@@ -619,6 +639,40 @@ fn extract_file(path: String) -> Result<String, String> {
     Ok(target_dir.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+async fn fetch_remote_models(base_url: String, api_key: String) -> Result<Vec<String>, String> {
+    // Ensure base_url ends with /v1 or /v1/, adjust if necessary
+    // Actually, usually users provide "https://api.openai.com/v1"
+    // We want to fetch "{base_url}/models".
+    // If base_url ends with slash, remove it first
+    let clean_base = base_url.trim_end_matches('/');
+    let url = format!("{}/models", clean_base);
+    
+    println!("Fetching models from: {}", url);
+
+    let client = reqwest::Client::new();
+    let res = client
+        .get(&url)
+        .header("Authorization", format!("Bearer {}", api_key))
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+
+    if !res.status().is_success() {
+        return Err(format!("API Error: {}", res.status()));
+    }
+
+    let body = res.text().await.map_err(|e| format!("Failed to read body: {}", e))?;
+    // println!("Models response: {}", body); // Debug
+
+    let response: ModelsResponse = serde_json::from_str(&body)
+        .map_err(|e| format!("Failed to parse JSON: {}", e))?;
+
+    let model_ids: Vec<String> = response.data.into_iter().map(|m| m.id).collect();
+    // Sort logic? OpenAI returns chaotic list. Maybe user wants to sort in UI.
+    
+    Ok(model_ids)
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -639,7 +693,8 @@ pub fn run() {
         pty_resize,
         pty_close,
         download_file,
-        extract_file
+        extract_file,
+        fetch_remote_models
     ])
     .manage(AppPty::default())
     .setup(|app| {

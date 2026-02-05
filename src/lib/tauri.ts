@@ -84,6 +84,7 @@ export interface ApiConfig {
     base_url: string | null;
     api_key: string | null;
     model: string | null;
+    models?: string[];
 }
 
 export interface AppConfig {
@@ -190,5 +191,15 @@ export const ptyResize = async (cols: number, rows: number): Promise<void> => {
         await invoke('pty_resize', { cols, rows });
     } catch (e) {
         console.warn("PTY Resize failed", e);
+    }
+};
+
+export const fetchRemoteModels = async (baseUrl: string, apiKey: string): Promise<string[]> => {
+    try {
+        return await invoke('fetch_remote_models', { baseUrl, apiKey });
+    } catch (e) {
+        console.warn("Fetch Models failed (Browser Mode)", e);
+        // Mock data for browser
+        return ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"];
     }
 };

@@ -17,7 +17,7 @@
   },
   "apps": {
       "title": "App Store",
-      "subtitle": "Discover and install developer tools, languages, and services.",
+      "subtitle": "Discover and install developer tools, languages, and services.\n OpenVizUI does not switch application versions, depending on your project requirements.",
       "searchPlaceholder": "Search apps...",
       "categories": {
           "languages": "Languages",
@@ -142,5 +142,36 @@
     "selectTool": "Select Tool",
     "noDirectory": "No directory selected",
     "workingDir": "Working Directory"
+  },
+  "chat": {
+    "change_dir": "Change Directory",
+    "select_dir": "Select Directory",
+    "project_files": "Project Files",
+    "sessions": "Sessions",
+    "no_folder": "No Folder Open",
+    "type_message": "Type a message...",
+    "select_tool": "Select Tool",
+    "select_config": "Select Config",
+    "select_model": "Select Model",
+    "copy_path": "Copy Path",
+    "path_copied": "Path copied",
+    "path_inserted": "Path inserted into chat",
+    "context_menu": {
+      "insert": "Insert into Chat",
+      "copy_path": "Copy Path",
+      "rename": "Rename",
+      "delete": "Delete"
+    },
+    "rename_title": "Rename",
+    "rename_success": "Rename successful",
+    "rename_failed": "Rename failed",
+    "new_name_label": "Enter new name:",
+    "delete_confirm_title": "Delete Confirmation",
+    "delete_confirm_content": "Are you sure you want to delete this item? This action cannot be undone.",
+    "delete_ok": "Delete",
+    "delete_success": "Deleted successfully",
+    "delete_failed": "Delete failed",
+    "ok": "OK",
+    "cancel": "Cancel"
   }
 }

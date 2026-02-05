@@ -1,7 +1,7 @@
-import { Card, Button, Row, Col, Tag, Typography, message, Modal, Select, Space, Tooltip } from 'antd';
+import { Card, Button, Row, Col, Tag, Typography, message, Modal, Select, Space, Tooltip, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ReloadOutlined, PlusOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
+import { ReloadOutlined, PlusOutlined, MessageOutlined } from '@ant-design/icons';
 import { installTool, uninstallTool, checkToolStatus, updateTool } from '../lib/tauri';
 import { useEffect, useState } from 'react';
 
@@ -17,6 +17,7 @@ interface ToolItem {
 }
 
 const Dashboard = () => {
+  const { token } = theme.useToken();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toolStatuses, activeTools, refreshTools, addActiveTool, removeActiveTool, setToolStatus } = useAppStore();
@@ -249,34 +250,6 @@ const Dashboard = () => {
             <Card 
               title={tool.name} 
               extra={tool.icon}
-              actions={[
-                 <Tooltip title="Run in Chat">
-                    <Button 
-                        type="text" 
-                        icon={<ConsoleSqlOutlined />} 
-                        disabled={processing[tool.id] || tool.status !== 'installed'} 
-                        onClick={() => handleRunInChat(tool.id)}
-                    />
-                 </Tooltip>,
-                   <Button type="text" onClick={() => handleConfig(tool.id)} disabled={processing[tool.id]}>{t('app.config')}</Button>,
-                  <Button 
-                    type="text" 
-                    onClick={() => handleUpdate(tool.id)} 
-                    loading={updating[tool.id]} 
-                    disabled={processing[tool.id] || tool.status !== 'installed'}
-                  >
-                    {t('app.update')}
-                  </Button>,
-                  <Button 
-                    type="text" 
-                    danger 
-                    loading={uninstalling[tool.id]} 
-                    onClick={() => handleUninstall(tool.id)}
-                    disabled={processing[tool.id]}
-                  >
-                    {t('app.uninstall')}
-                  </Button>
-               ]}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                  <span>Status:</span>
@@ -284,9 +257,61 @@ const Dashboard = () => {
                     {tool.status === 'installed' ? 'Installed' : 'Error'}
                  </Tag>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
                  <span>Version:</span>
                  <span>{tool.version}</span>
+              </div>
+
+              {/* Custom Action Footer */}
+              <div style={{ borderTop: `1px solid ${token.colorBorderSecondary}`, paddingTop: 12, margin: '0 -24px -24px -24px', padding: '12px 24px 24px 24px', background: token.colorFillAlter }}>
+                  {/* Row 1: Execute | Config | Guide */}
+                  <Row gutter={8} style={{ marginBottom: 8 }}>
+                      <Col span={8}>
+                          <Tooltip title="Run in Chat">
+                            <Button 
+                                type="primary" 
+                                ghost
+                                block
+                                icon={<MessageOutlined />} 
+                                disabled={processing[tool.id] || tool.status !== 'installed'} 
+                                onClick={() => handleRunInChat(tool.id)}
+                            />
+                          </Tooltip>
+                      </Col>
+                      <Col span={8}>
+                          <Button block onClick={() => handleConfig(tool.id)} disabled={processing[tool.id]} style={{ padding: '4px 0' }}>
+                              {t('app.config')}
+                          </Button>
+                      </Col>
+                      <Col span={8}>
+                           <Button block disabled style={{ padding: '4px 0' }}>Guide</Button>
+                      </Col>
+                  </Row>
+                  
+                  {/* Row 2: Update | Uninstall */}
+                  <Row gutter={8}>
+                      <Col span={12}>
+                          <Button 
+                            block
+                            onClick={() => handleUpdate(tool.id)} 
+                            loading={updating[tool.id]} 
+                            disabled={processing[tool.id] || tool.status !== 'installed'}
+                          >
+                            {t('app.update')}
+                          </Button>
+                      </Col>
+                      <Col span={12}>
+                          <Button 
+                            block
+                            danger 
+                            loading={uninstalling[tool.id]} 
+                            onClick={() => handleUninstall(tool.id)}
+                            disabled={processing[tool.id]}
+                          >
+                            {t('app.uninstall')}
+                          </Button>
+                      </Col>
+                  </Row>
               </div>
             </Card>
           </Col>

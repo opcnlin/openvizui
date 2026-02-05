@@ -143,5 +143,36 @@
     "selectTool": "选择工具",
     "noDirectory": "未选择目录",
     "workingDir": "工作目录"
+  },
+  "chat": {
+    "change_dir": "更换目录",
+    "select_dir": "选择目录",
+    "project_files": "项目文件",
+    "sessions": "历史会话",
+    "no_folder": "未打开目录",
+    "type_message": "输入消息...",
+    "select_tool": "选择工具",
+    "select_config": "选择配置",
+    "select_model": "选择模型",
+    "copy_path": "复制路径",
+    "path_copied": "路径已复制",
+    "path_inserted": "路径已插入输入框",
+    "context_menu": {
+      "insert": "插入到聊天",
+      "copy_path": "复制路径",
+      "rename": "重命名",
+      "delete": "删除"
+    },
+    "rename_title": "重命名",
+    "rename_success": "重命名成功",
+    "rename_failed": "重命名失败",
+    "new_name_label": "请输入新名称：",
+    "delete_confirm_title": "确认删除",
+    "delete_confirm_content": "您确定要删除此项目吗？该操作不可撤销。",
+    "delete_ok": "确认删除",
+    "delete_success": "删除成功",
+    "delete_failed": "删除失败",
+    "ok": "确定",
+    "cancel": "取消"
   }
 }
