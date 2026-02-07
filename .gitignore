@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 psd
+openvizui.md
 *.local
 
 # Editor directories and files
